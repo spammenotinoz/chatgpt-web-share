@@ -177,8 +177,8 @@
     "viewAttachments": "Expand {0} attachments"
   },
   "errors": {
-    "403": "403 error: access denied",
-    "404": "404 Not Found",
+    "403": "403 : If you just logged in, this is expected, please Refresh the Page",
+    "404": "404 : If you just logged in, this is expected, please Refresh the Page",
     "loginExpired": "Login expired",
     "userNotLogin": "User not logged in",
     "askError": "Failed to get reply",
