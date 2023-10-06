@@ -168,29 +168,6 @@ const renderPluginSelectionTag: SelectRenderTag = ({ option, handleClose }) => {
   );
 };
 
-function setDefaultValues() {
-  //   const defaultSource = computed(() => {
-  if (appStore.lastSelectedSource) {
-    if (availableChatSourceTypes.value.find((source) => source.value === appStore.lastSelectedSource)) {
-      newConversationInfo.value.source = appStore.lastSelectedSource;
-    }
-  } else {
-    newConversationInfo.value.source =
-      availableChatSourceTypes.value.length > 0 ? (availableChatSourceTypes.value[0].value as string) : null;
-  }
-
-  if (appStore.lastSelectedModel) {
-    if (
-      newConversationInfo.value.source === 'openai_web' &&
-      availableModels.value.find((model) => model.value === appStore.lastSelectedModel)
-    ) {
-      newConversationInfo.value.model = appStore.lastSelectedModel;
-    }  
-  }
-}
-
-setDefaultValues();
-
 watch(
   () => {
     return [newConversationInfo.value.source, newConversationInfo.value.model];
