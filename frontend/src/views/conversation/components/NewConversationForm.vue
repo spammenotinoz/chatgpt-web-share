@@ -105,6 +105,8 @@ const availableModels = computed<SelectOption[]>(() => {
   }
 });
 
+const defaultModel = 'gpt_3_5';
+
 const newConversationInfo = ref<NewConversationInfo>({
   title: null,
   source: 'openai_web',
