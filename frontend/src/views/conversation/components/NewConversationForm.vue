@@ -185,12 +185,7 @@ function setDefaultValues() {
       availableModels.value.find((model) => model.value === appStore.lastSelectedModel)
     ) {
       newConversationInfo.value.model = appStore.lastSelectedModel;
-    } else if (
-      newConversationInfo.value.source === 'openai_api' &&
-      availableModels.value.find((model) => model.value === appStore.lastSelectedModel)
-    ) {
-      newConversationInfo.value.model = appStore.lastSelectedModel;
-    }
+    }  
   }
 }
 
