@@ -7,9 +7,6 @@
           :placeholder="newConversationInfo.source == 'openai_web' ? t('tips.NewConversationForm.leaveBlankToGenerateTitle') : null"
         />
       </n-form-item>
-      <n-form-item :label="t('labels.source')">
-        <n-select v-model:value="newConversationInfo.source" :options="availableChatSourceTypes" />
-      </n-form-item>
       <n-form-item :label="t('labels.model')">
         <n-select v-model:value="newConversationInfo.model" :options="availableModels" />
       </n-form-item>
@@ -45,6 +42,24 @@ import { OpenaiChatPlugin } from '@/types/schema';
 import { Message } from '@/utils/tips';
 
 import NewConversationFormSelectionPluginLabel from './NewConversationFormSelectionPluginLabel.vue';
+
+//////
+import { MdPeople } from '@vicons/ionicons4';
+import { EventBusyFilled, QueueFilled } from '@vicons/material';
+import { getServerStatusApi } from '@/api/status';
+import { CommonStatusSchema } from '@/types/schema';
+
+const serverStatus = ref<CommonStatusSchema>({});
+
+const updateData = () => {
+  getServerStatusApi().then((res) => {
+    // console.log(res.data);
+    serverStatus.value = res.data;
+  });
+};
+updateData();
+
+///////
 
 const t = i18n.global.t as any;
 
@@ -92,8 +107,8 @@ const availableModels = computed<SelectOption[]>(() => {
 
 const newConversationInfo = ref<NewConversationInfo>({
   title: null,
-  source: null,
-  model: null,
+  source: 'openai_web',
+  model: 'gpt_3_5',
   openaiWebPlugins: null,
 });
 
@@ -203,10 +218,14 @@ watch(
 
 watch(
   () => {
+    const model = newConversationInfo.value.model;
+    const gpt4Count = serverStatus.value?.gpt4_count_in_3_hours ?? 0;
+    const source = (model === 'gpt_4' && gpt4Count > 40) ? 'openai_api' : (model === 'gpt_4') ? 'openai_web' : 'openai_web'; // If GPT Usage is high, then use APIs
+    
     return {
       title: newConversationInfo.value.title,
-      source: newConversationInfo.value.source,
-      model: newConversationInfo.value.model,
+      source: source,
+      model: model,
       openaiWebPlugins: newConversationInfo.value.openaiWebPlugins,
     } as NewConversationInfo;
   },
@@ -223,4 +242,5 @@ watch(
     newConversationInfo.value.model = null;
   }
 );
+
 </script>
