@@ -178,23 +178,8 @@ const currentRecvMessages = ref<BaseChatMessage[]>([]);
 //     currentConversation.value.current_model == 'gpt_4_code_interpreter'
 //   );
 // });
-const uploadMode = computed(() => {
-  const allowAttachmentsUploading = userStore.userInfo?.setting.openai_web.allow_uploading_attachments;
-  const allowMultimodalImagesUploading = userStore.userInfo?.setting.openai_web.allow_uploading_multimodal_images;
-  if (
-    allowAttachmentsUploading &&
-    currentConversation.value?.source === 'openai_api' &&
-    currentConversation.value.current_model == 'gpt_3_5'
-  )
-    return 'attachments';
-  else if (
-    allowMultimodalImagesUploading &&
-    currentConversation.value?.source === 'openai_web' &&
-    currentConversation.value.current_model == 'gpt_4'
-  )
-    return 'images';
-  else return null;
-});
+const uploadMode = 'attachments'
+  });
 
 // 实际的 currentMessageList，加上当前正在发送的消息
 const currentActiveMessages = computed<Array<BaseChatMessage>>(() => {
