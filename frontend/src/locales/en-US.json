@@ -331,7 +331,7 @@
     "username": "username",
     "valid_until": "validity period",
     "source": "source",
-    "gpt4_count_in_3_hours": "GPT-4 dosage / 3h",
+    "gpt4_count_in_3_hours": "dosage / 3h",
     "plugins": "plug-in",
     "config": {
       "enabled_models": "Enabled Models",
@@ -340,7 +340,7 @@
     }
   },
   "models": {
-    "gpt_3_5": "GPT-3.5",
+    "gpt_3_5": "Claude2",
     "gpt_3_5_mobile": "GPT-3.5 Mobile",
     "gpt_4": "GPT-4",
     "gpt_4_mobile": "GPT-4 Mobile",
@@ -350,11 +350,11 @@
   },
   "sources": {
     "openai_web": "OpenAI Web",
-    "openai_api": "OpenAI API"
+    "openai_api": "Anthoropic"
   },
   "sources_short": {
     "openai_web": "Web",
-    "openai_api": "API"
+    "openai_api": "Anthropic"
   },
   "desc": {
     "daily_available_time_slots": "It is only allowed to be used during these time periods of the day, if it is empty, it means unlimited.",
