@@ -178,8 +178,8 @@ const currentRecvMessages = ref<BaseChatMessage[]>([]);
 //     currentConversation.value.current_model == 'gpt_4_code_interpreter'
 //   );
 // });
-const uploadMode = 'attachments'
-  });
+const uploadMode = 'attachments';
+  
 
 // 实际的 currentMessageList，加上当前正在发送的消息
 const currentActiveMessages = computed<Array<BaseChatMessage>>(() => {
