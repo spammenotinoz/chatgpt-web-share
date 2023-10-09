@@ -277,7 +277,7 @@
       "failedToGetPlugins": "Failed to get list of plugins",
       "loadingPlugins": "Loading plugins...",
       "selectPlugins": "select plugin",
-      "leaveBlankToGenerateTitle": "Leave blank to automatically generate"
+      "leaveBlankToGenerateTitle": "Optional Chat Description"
     },
     "openaiWebPluginsLengthMoreThan3": "The number of plugins cannot exceed 3",
     "dragFileHere": "Click or drag file(s) here to upload",
