@@ -183,8 +183,8 @@ const uploadMode = computed(() => {
   const allowMultimodalImagesUploading = userStore.userInfo?.setting.openai_web.allow_uploading_multimodal_images;
   if (
     allowAttachmentsUploading &&
-    currentConversation.value?.source === 'openai_web' &&
-    currentConversation.value.current_model == 'gpt_4_code_interpreter'
+    currentConversation.value?.source === 'openai_api' &&
+    currentConversation.value.current_model == 'gpt_3_5'
   )
     return 'attachments';
   else if (
