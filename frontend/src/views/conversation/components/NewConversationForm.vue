@@ -8,25 +8,6 @@
           :placeholder="newConversationInfo.source == 'openai_web' ? t('tips.NewConversationForm.leaveBlankToGenerateTitle') : null"
         />
       </n-form-item>
-      <n-form-item :label="t('labels.model')">
-        <n-select v-model:value="newConversationInfo.model" :options="availableModels" />
-      </n-form-item>
-      <n-form-item
-        v-if="newConversationInfo.source === 'openai_web' && newConversationInfo.model === 'gpt_4_plugins'"
-        :label="t('labels.plugins')"
-      >
-        <n-select
-          v-model:value="newConversationInfo.openaiWebPlugins"
-          :options="pluginOptions"
-          clearable
-          multiple
-          :placeholder="selectPluginPlaceholder"
-          :loading="loadingPlugins"
-          :disabled="loadingPlugins"
-          :render-label="renderPluginSelectionLabel"
-          :render-tag="renderPluginSelectionTag"
-        />
-      </n-form-item>
     </n-form>
   </div>
 </template>
