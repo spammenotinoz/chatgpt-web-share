@@ -197,8 +197,8 @@ watch(
       
     return {
       title: newConversationInfo.value.title,
-      source: openai_web,
-      model: gpt_3_5,
+      source: 'openai_api',
+      model: 'gpt_3_5',
       openaiWebPlugins: newConversationInfo.value.openaiWebPlugins,
     } as NewConversationInfo;
   },
