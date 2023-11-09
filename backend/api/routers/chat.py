@@ -208,12 +208,15 @@ async def check_limits(user: UserReadAdmin, ask_request: AskRequest):
 
     # 判断是否允许使用附件
     if ask_request.openai_web_attachments and len(ask_request.openai_web_attachments) > 0:
-      if (ask_request.model == OpenaiWebChatModels.gpt_4 or \
-          ask_request.model == OpenaiWebChatModels.gpt_4_code_interpreter) and \
-          config.openai_web.enable_uploading_attachments is True:
-        # Allow attachments
-      else:
-        raise WebsocketInvalidAskException("errors.attachmentsNotAllowed")
+        if (ask_request.model == OpenaiWebChatModels.gpt_4 or \
+            ask_request.model == OpenaiWebChatModels.gpt_4_code_interpreter) and \
+            config.openai_web.enable_uploading_attachments is True:
+            # Allow attachments
+        else:
+            raise WebsocketInvalidAskException("errors.attachmentsNotAllowed")
+
+    if plugin_id in _plugins_manifests_map:
+        return _plugins_manifests_map[plugin_id]
 
 def check_message(msg: str):
     # 检查消息中的敏感信息
