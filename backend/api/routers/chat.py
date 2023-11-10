@@ -210,7 +210,7 @@ async def check_limits(user: UserReadAdmin, ask_request: AskRequest):
     if ask_request.openai_web_attachments and len(ask_request.openai_web_attachments) > 0:
         if (ask_request.model == OpenaiWebChatModels.gpt_4 or
             ask_request.model == OpenaiWebChatModels.gpt_4_code_interpreter) and \\
-                config.openai_web.enable_uploading_attachments is True:
+            config.openai_web.enable_uploading_attachments is True:
             # Allow attachments
         else:
             raise WebsocketInvalidAskException("errors.attachmentsNotAllowed") 
