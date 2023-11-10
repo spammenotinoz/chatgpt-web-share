@@ -218,9 +218,6 @@ async def check_limits(user: UserReadAdmin, ask_request: AskRequest):
             else:
                 raise WebsocketInvalidAskException("errors.attachmentsNotAllowed")
 
-if plugin_id in _plugins_manifests_map:
-    return _plugins_manifests_map[plugin_id]
-
 def check_message(msg: str):
     # 检查消息中的敏感信息
     url = Config().openai_web.chatgpt_base_url
