@@ -257,8 +257,8 @@ watch(
     } as NewConversationInfo;
   },
   (newVal, _prev) => {
-    if (newVal.model === 'openai_api') {
-      newVal.source = 'gpt_3.5';
+    if (newVal.source === 'openai_api') {
+      newVal.model = 'gpt_3.5';
     }
     // console.log('newConversationInfo', newVal);
     emits('input', newVal);
