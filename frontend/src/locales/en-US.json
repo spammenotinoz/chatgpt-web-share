@@ -357,8 +357,8 @@
   },
   "modelDescriptions": {
     "openai_api": {
-      "gpt_3_5": "The fastest model, great for most everyday tasks.",
-      "gpt_4": "The most capable model, great for tasks that require creativity and advanced reasoning. Relatively slow."
+      "Claude_2.1": "Claude 2.1 from Anthropic, the Ethical Assistant.",
+      "Claude_2.1": "Claude 2.1 from Anthropic, the Ethical Assistant."
     },
     "openai_web": {
       "gpt_3_5": "The fastest model, great for most everyday tasks.",
@@ -373,7 +373,7 @@
   },
   "sources": {
     "openai_web": "OpenAI Web",
-    "openai_api": "OpenAI API"
+    "openai_api": "Other"
   },
   "sources_short": {
     "openai_web": "Web",
