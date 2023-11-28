@@ -246,9 +246,10 @@ watch(
   },
   { immediate: true }
 );
-
+  
 watch(
   () => {
+    const model = (source === 'openai_api' ? 'gpt_3_5';
     return {
       title: newConversationInfo.value.title,
       source: newConversationInfo.value.source,
