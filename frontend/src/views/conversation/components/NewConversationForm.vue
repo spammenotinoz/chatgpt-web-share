@@ -246,29 +246,35 @@ watch(
   },
   { immediate: true }
 );
+
+watch(
+  ([source, model]) => {
+    if (source === 'openai_api') {
+      newConversationInfo.value.model = 'gpt_3_5'
+    }
+  } 
+)
   
 watch(
-  ([source, model]) => {  
-    if (source === 'openai_api') {
-      newConversationInfo.value.model = 'gpt_3_5';
-    }
-    
+  () => {
     return {
-      title: newConversationInfo.value.title, 
+      title: newConversationInfo.value.title,
       source: newConversationInfo.value.source,
       model: newConversationInfo.value.model,
       openaiWebPlugins: newConversationInfo.value.openaiWebPlugins,
     } as NewConversationInfo;
-  }, 
-  (newVal, prev) => {
+  },
+  (newVal, _prev) => {
+    // console.log('newConversationInfo', newVal);
     emits('input', newVal);
-  }
-)
+  },
+  { immediate: true }
+);
 
 watch(
-  () => newConversationInfo.value.source, 
+  () => newConversationInfo.value.source,
   () => {
     newConversationInfo.value.model = null;
   }
-)
+);
 </script>
