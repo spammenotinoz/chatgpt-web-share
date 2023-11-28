@@ -372,8 +372,8 @@
     }
   },
   "sources": {
-    "openai_web": "OpenAI Web",
-    "openai_api": "Other"
+    "openai_web": "OpenAI",
+    "openai_api": "Claude via GPT3.5"
   },
   "sources_short": {
     "openai_web": "OpenAI",
