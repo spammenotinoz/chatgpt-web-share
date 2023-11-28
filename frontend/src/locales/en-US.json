@@ -357,8 +357,8 @@
   },
   "modelDescriptions": {
     "openai_api": {
-      "Claude_2.1": "Claude 2.1 from Anthropic, the Ethical Assistant.",
-      "Claude_2.1": "Claude 2.1 from Anthropic, the Ethical Assistant."
+      "gpt_3_5": "Claude 2.1 from Anthropic, the Ethical Assistant.",
+      "gpt_4": "Claude 2.1 from Anthropic, the Ethical Assistant."
     },
     "openai_web": {
       "gpt_3_5": "The fastest model, great for most everyday tasks.",
@@ -376,8 +376,8 @@
     "openai_api": "Other"
   },
   "sources_short": {
-    "openai_web": "Web",
-    "openai_api": "API"
+    "openai_web": "OpenAI",
+    "openai_api": "Other"
   },
   "desc": {
     "daily_available_time_slots": "It is only allowed to be used during these time periods of the day, if it is empty, it means unlimited.",
