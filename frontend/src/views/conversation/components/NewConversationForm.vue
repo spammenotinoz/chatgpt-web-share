@@ -8,8 +8,14 @@
             newConversationInfo.source == 'openai_web' ? t('tips.NewConversationForm.leaveBlankToGenerateTitle') : null
           "
         />
+      </n-form-item>    
+      <n-form-item :label="t('labels.source')">
+        <n-select v-model:value="newConversationInfo.source" :options="availableChatSourceTypes" />
       </n-form-item>
-      <n-form-item :label="t('labels.model')">
+
+      <n-form-item
+        v-if="newConversationInfo.source === 'openai_api'"
+        :label="t('labels.model')">
         <n-select
           v-model:value="newConversationInfo.model"
           :options="availableModels"
@@ -27,6 +33,14 @@
                     `modelDescriptions.${newConversationInfo.source}.${
                       currentHoveringModel || newConversationInfo.model
                     }`
+                  )
+                }}
+              </div>
+              <div class="text-xs text-right">
+                {{ t('commons.remain') }}:
+                {{
+                  getCountTrans(
+                    userStore.user?.setting[newConversationInfo.source!].per_model_ask_count[newConversationInfo.model!]
                   )
                 }}
               </div>
