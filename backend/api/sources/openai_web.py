@@ -26,7 +26,7 @@ from api.models.json import UploadedFileOpenaiWebInfo
 from api.schemas.file_schemas import UploadedFileInfoSchema
 from api.schemas.openai_schemas import OpenaiChatPlugin, OpenaiChatPluginUserSettings, OpenaiChatFileUploadUrlRequest, \
     OpenaiChatFileUploadUrlResponse, OpenaiWebCompleteRequest, \
-    OpenaiWebCompleteRequestConversationMode
+    OpenaiWebCompleteRequestConversationMode, OpenaiChatPluginListResponse
 from utils.common import singleton_with_lock
 from utils.logger import get_logger
 
@@ -82,7 +82,7 @@ def convert_revchatgpt_message(item: dict, message_id: str = None) -> OpenaiWebC
         )
     )
     if "metadata" in item["message"] and item["message"]["metadata"] != {}:
-        result.metadata = result.metadata.copy(
+        result.metadata = result.metadata.model_copy(
             update=item["message"]["metadata"]
         )
         model_code = item["message"]["metadata"].get("model_slug")
@@ -213,7 +213,7 @@ class OpenaiWebChatManager:
             current_model = get_latest_model_from_mapping(result["current_node"], mapping)
         doc = OpenaiWebConversationHistoryDocument(
             source="openai_web",
-            id=conversation_id,
+            _id=conversation_id,
             title=result.get("title"),
             create_time=result.get("create_time"),
             update_time=result.get("update_time"),
@@ -235,22 +235,26 @@ class OpenaiWebChatManager:
         response = await self.session.patch(url, json={"is_visible": False})
         await _check_response(response)
 
-    async def complete(self, text_content: str, conversation_id: uuid.UUID = None, parent_id: uuid.UUID = None,
+    async def complete(self, text_content: str, conversation_id: uuid.UUID = None, parent_message_id: uuid.UUID = None,
                        model: OpenaiWebChatModels = None, plugin_ids: list[str] = None,
                        attachments: list[OpenaiWebChatMessageMetadataAttachment] = None,
-                       multimodal_image_parts: list[OpenaiWebChatMessageMultimodalTextContentImagePart] = None, **_kwargs):
+                       multimodal_image_parts: list[OpenaiWebChatMessageMultimodalTextContentImagePart] = None,
+                       **_kwargs):
 
         assert config.openai_web.enabled, "OpenAI Web is not enabled"
 
         model = model or OpenaiWebChatModels.gpt_3_5
 
-        if conversation_id or parent_id:
-            assert parent_id and conversation_id, "parent_id must be set with conversation_id"
-        else:
-            parent_id = str(uuid.uuid4())
-
         if plugin_ids is not None and len(plugin_ids) > 0 and model != OpenaiWebChatModels.gpt_4_plugins:
             raise InvalidParamsException("plugin_ids can only be set when model is gpt-4-plugins")
+
+        if plugin_ids is not None and len(plugin_ids) > 0 and parent_message_id:
+            raise InvalidParamsException("plugin_ids can only be set at new conversation")
+
+        if conversation_id or parent_message_id:
+            assert parent_message_id and conversation_id, "parent_message_id must be set with conversation_id"
+        else:
+            parent_message_id = str(uuid.uuid4())
 
         if text_content == ":continue":
             messages = None
@@ -286,7 +290,7 @@ class OpenaiWebChatManager:
             conversation_mode=OpenaiWebCompleteRequestConversationMode(kind="primary_assistant"),
             conversation_id=str(conversation_id) if conversation_id else None,
             messages=messages,
-            parent_message_id=str(parent_id) if parent_id else None,
+            parent_message_id=str(parent_message_id) if parent_message_id else None,
             model=model.code(),
             plugin_ids=plugin_ids
         ).dict(exclude_none=True)
@@ -345,23 +349,44 @@ class OpenaiWebChatManager:
         else:
             raise OpenaiWebException(f"Failed to generate title: {result.get('message')}")
 
-    async def get_plugin_manifests(self, statuses="approved", is_installed=None, offset=0, limit=250):
-        if not config.openai_web.is_plus_account:
-            raise InvalidParamsException("errors.notPlusChatgptAccount")
+    async def get_installed_plugin_manifests(self, offset=0, limit=250) -> OpenaiChatPluginListResponse:
         params = {
-            "statuses": statuses,
             "offset": offset,
             "limit": limit,
+            "is_installed": True,
         }
-        if is_installed is not None:
-            params["is_installed"] = is_installed
         response = await self.session.get(
             url=f"{config.openai_web.chatgpt_base_url}aip/p",
             params=params,
-            timeout=config.openai_web.ask_timeout
+            timeout=config.openai_web.common_timeout
         )
         await _check_response(response)
-        return parse_obj_as(list[OpenaiChatPlugin], response.json().get("items"))
+        return OpenaiChatPluginListResponse.model_validate(response.json())
+
+    async def get_plugin_manifests(self, offset=0, limit=8, category="", search="") -> OpenaiChatPluginListResponse:
+        if not config.openai_web.is_plus_account:
+            raise InvalidParamsException("errors.notPlusChatgptAccount")
+        params = {
+            "offset": offset,
+            "limit": limit,
+            "category": category,
+            "search": search,
+        }
+        response = await self.session.get(
+            url=f"{config.openai_web.chatgpt_base_url}aip/p/approved",
+            params=params,
+            timeout=config.openai_web.common_timeout
+        )
+        await _check_response(response)
+        return OpenaiChatPluginListResponse.model_validate(response.json())
+
+    # async def get_plugin_manifest(self, plugin_id: str) -> OpenaiChatPluginListResponse:
+    #     response = await self.session.get(
+    #         url=f"{config.openai_web.chatgpt_base_url}public/plugins/by-id",
+    #         params={"ids": plugin_id},
+    #     )
+    #     await _check_response(response)
+    #     return OpenaiChatPluginListResponse.parse_obj(response.json())
 
     async def change_plugin_user_settings(self, plugin_id: str, setting: OpenaiChatPluginUserSettings):
         if not config.openai_web.is_plus_account:
@@ -372,7 +397,7 @@ class OpenaiWebChatManager:
         )
         await _check_response(response)
         try:
-            result = OpenaiChatPlugin.parse_obj(response.json())
+            result = OpenaiChatPlugin.model_validate(response.json())
             return result
         except ValidationError as e:
             logger.warning(f"Failed to parse plugin: {e}")
@@ -419,7 +444,7 @@ class OpenaiWebChatManager:
             json=upload_info.dict()
         )
         await _check_response(response)
-        result = OpenaiChatFileUploadUrlResponse.parse_obj(response.json())
+        result = OpenaiChatFileUploadUrlResponse.model_validate(response.json())
         if result.status != "success":
             raise OpenaiWebException(
                 f"{upload_info.file_name} Failed to get upload url from OpenAI: {result.error_code}({result.error_message})")
