@@ -373,11 +373,11 @@
   },
   "sources": {
     "openai_web": "OpenAI",
-    "openai_api": "Claude via GPT3.5"
+    "openai_api": "Claude"
   },
   "sources_short": {
     "openai_web": "OpenAI",
-    "openai_api": "Other"
+    "openai_api": "Claude"
   },
   "desc": {
     "daily_available_time_slots": "It is only allowed to be used during these time periods of the day, if it is empty, it means unlimited.",
