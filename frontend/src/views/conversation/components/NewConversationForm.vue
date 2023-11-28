@@ -9,12 +9,7 @@
           "
         />
       </n-form-item>
-      <n-form-item :label="t('labels.source')">
-        <n-select v-model:value="newConversationInfo.source" :options="availableChatSourceTypes" />
-      </n-form-item>
-      <n-form-item
-        v-if="newConversationInfo.source === 'openai_web'"
-        :label="t('labels.model')">
+      <n-form-item :label="t('labels.model')">
         <n-select
           v-model:value="newConversationInfo.model"
           :options="availableModels"
@@ -257,15 +252,12 @@ watch(
     } as NewConversationInfo;
   },
   (newVal, _prev) => {
-    if (newVal.source === 'openai_api') {
-      newVal.model = 'gpt_3_5';
-    }
     // console.log('newConversationInfo', newVal);
     emits('input', newVal);
   },
   { immediate: true }
 );
-  
+
 watch(
   () => newConversationInfo.value.source,
   () => {
