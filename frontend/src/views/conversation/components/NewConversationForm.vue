@@ -248,14 +248,6 @@ watch(
 );
 
 watch(
-  ([source, model]) => {
-    if (source === 'openai_api') {
-      newConversationInfo.value.model = 'gpt_3_5'
-    }
-  } 
-)
-  
-watch(
   () => {
     return {
       title: newConversationInfo.value.title,
@@ -265,12 +257,15 @@ watch(
     } as NewConversationInfo;
   },
   (newVal, _prev) => {
+    if (newVal.model === 'openai_api') {
+      newVal.source = 'gpt_3.5';
+    }
     // console.log('newConversationInfo', newVal);
     emits('input', newVal);
   },
   { immediate: true }
 );
-
+  
 watch(
   () => newConversationInfo.value.source,
   () => {
