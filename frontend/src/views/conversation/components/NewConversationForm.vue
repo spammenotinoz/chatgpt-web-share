@@ -13,7 +13,7 @@
         <n-select v-model:value="newConversationInfo.source" :options="availableChatSourceTypes" />
       </n-form-item>
       <n-form-item
-        v-if="newConversationInfo.source === 'openai_api'"
+        v-if="newConversationInfo.source === 'openai_web'"
         :label="t('labels.model')">
         <n-select
           v-model:value="newConversationInfo.model"
