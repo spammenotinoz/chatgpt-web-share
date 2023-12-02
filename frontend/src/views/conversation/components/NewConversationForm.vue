@@ -9,9 +9,6 @@
           "
         />
       </n-form-item>
-      <n-form-item :label="t('labels.source')">
-        <n-select v-model:value="newConversationInfo.source" :options="availableChatSourceTypes" />
-      </n-form-item>
       <n-form-item :label="t('labels.model')">
         <n-select
           v-model:value="newConversationInfo.model"
@@ -26,18 +23,10 @@
               <div class="mb-2 text-xs">
                 <span class="font-semibold">{{ t('commons.modelDescriptions') }}: </span>
                 {{
-                  (currentHoveringModel || newConversationInfo.model) ? t(
+                  t(
                     `modelDescriptions.${newConversationInfo.source}.${
                       currentHoveringModel || newConversationInfo.model
                     }`
-                  ) : ''
-                }}
-              </div>
-              <div class="text-xs text-right">
-                {{ t('commons.remain') }}:
-                {{
-                  getCountTrans(
-                    userStore.user?.setting[newConversationInfo.source!].per_model_ask_count[newConversationInfo.model!]
                   )
                 }}
               </div>
@@ -69,7 +58,7 @@
 import { NAvatar, NTag, NTooltip, SelectOption, SelectRenderTag } from 'naive-ui';
 import { computed, h, ref, VNode, watch } from 'vue';
 
-import { getInstalledOpenaiChatPluginsApi, getOpenaiChatPluginsApi } from '@/api/chat';
+import { getAllOpenaiChatPluginsApi, getInstalledOpenaiChatPluginsApi } from '@/api/chat';
 import { i18n } from '@/i18n';
 import { useAppStore, useUserStore } from '@/store';
 import { NewConversationInfo } from '@/types/custom';
@@ -79,6 +68,24 @@ import { Message } from '@/utils/tips';
 
 import NewConversationFormModelSelectionLabel from './NewConversationFormModelSelectionLabel.vue';
 import NewConversationFormPluginSelectionLabel from './NewConversationFormPluginSelectionLabel.vue';
+
+//////
+import { MdPeople } from '@vicons/ionicons4';
+import { EventBusyFilled, QueueFilled } from '@vicons/material';
+import { getServerStatusApi } from '@/api/status';
+import { CommonStatusSchema } from '@/types/schema';
+
+const serverStatus = ref<CommonStatusSchema>({});
+
+const updateData = () => {
+  getServerStatusApi().then((res) => {
+    // console.log(res.data);
+    serverStatus.value = res.data;
+  });
+};
+updateData();
+
+///////
 
 const t = i18n.global.t as any;
 
@@ -147,8 +154,8 @@ const pluginOptions = computed<SelectOption[]>(() => {
     return [];
   }
   return availablePlugins.value.map((plugin) => ({
-    label: plugin.manifest?.name_for_human || plugin.id!,
-    value: plugin.id!,
+    label: plugin.manifest?.name_for_human,
+    value: plugin.id,
   }));
 });
 
@@ -207,7 +214,7 @@ const renderPluginSelectionTag: SelectRenderTag = ({ option, handleClose }) => {
           { class: 'flex flex-row' },
           {
             default: () => [
-              h(NAvatar, { size: 'small', src: plugin?.manifest?.logo_url || undefined }),
+              h(NAvatar, { size: 'small', src: plugin?.manifest?.logo_url }),
               h('div', { class: 'ml-2' }, { default: () => plugin?.manifest?.name_for_human }),
             ],
           }
@@ -217,29 +224,8 @@ const renderPluginSelectionTag: SelectRenderTag = ({ option, handleClose }) => {
 };
 
 function setDefaultValues() {
-  //   const defaultSource = computed(() => {
-  if (appStore.lastSelectedSource) {
-    if (availableChatSourceTypes.value.find((source) => source.value === appStore.lastSelectedSource)) {
-      newConversationInfo.value.source = appStore.lastSelectedSource;
-    }
-  } else {
-    newConversationInfo.value.source =
-      availableChatSourceTypes.value.length > 0 ? (availableChatSourceTypes.value[0].value as ChatSourceTypes) : null;
-  }
-
-  if (appStore.lastSelectedModel) {
-    if (
-      newConversationInfo.value.source === 'openai_web' &&
-      availableModels.value.find((model) => model.value === appStore.lastSelectedModel)
-    ) {
-      newConversationInfo.value.model = appStore.lastSelectedModel;
-    } else if (
-      newConversationInfo.value.source === 'openai_api' &&
-      availableModels.value.find((model) => model.value === appStore.lastSelectedModel)
-    ) {
-      newConversationInfo.value.model = appStore.lastSelectedModel;
-    }
-  }
+      newConversationInfo.value.source = 'openai_web';
+      newConversationInfo.value.model = 'gpt_3_5';
 }
 
 setDefaultValues();
@@ -254,7 +240,7 @@ watch(
       loadingPlugins.value = true;
       try {
         const res = await getInstalledOpenaiChatPluginsApi();
-        availablePlugins.value = res.data.items;
+        availablePlugins.value = res.data;
       } catch (err) {
         Message.error(t('tips.NewConversationForm.failedToGetPlugins'));
       }
@@ -268,10 +254,14 @@ watch(
 
 watch(
   () => {
+    const model = newConversationInfo.value.model;
+    const gpt4Count = serverStatus.value?.gpt4_count_in_3_hours ?? 0;
+    const source = (model === 'gpt_4' && gpt4Count > 45) ? 'openai_api' : (model === 'gpt_4') ? 'openai_web' : 'openai_web'; // If GPT Usage is high, then use APIs
+    
     return {
       title: newConversationInfo.value.title,
-      source: newConversationInfo.value.source,
-      model: newConversationInfo.value.model,
+      source: source,
+      model: model,
       openaiWebPlugins: newConversationInfo.value.openaiWebPlugins,
     } as NewConversationInfo;
   },
@@ -288,4 +278,5 @@ watch(
     newConversationInfo.value.model = null;
   }
 );
+
 </script>
