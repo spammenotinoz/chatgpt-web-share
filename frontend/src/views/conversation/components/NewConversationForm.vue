@@ -23,11 +23,11 @@
               <div class="mb-2 text-xs">
                 <span class="font-semibold">{{ t('commons.modelDescriptions') }}: </span>
                 {{
-                  t(
+                  (currentHoveringModel || newConversationInfo.model) ? t(
                     `modelDescriptions.${newConversationInfo.source}.${
                       currentHoveringModel || newConversationInfo.model
                     }`
-                  )
+                  ) : ''
                 }}
               </div>
               <div class="text-xs text-right">
@@ -144,8 +144,8 @@ const pluginOptions = computed<SelectOption[]>(() => {
     return [];
   }
   return availablePlugins.value.map((plugin) => ({
-    label: plugin.manifest?.name_for_human,
-    value: plugin.id,
+    label: plugin.manifest?.name_for_human || plugin.id!,
+    value: plugin.id!,
   }));
 });
 
@@ -204,7 +204,7 @@ const renderPluginSelectionTag: SelectRenderTag = ({ option, handleClose }) => {
           { class: 'flex flex-row' },
           {
             default: () => [
-              h(NAvatar, { size: 'small', src: plugin?.manifest?.logo_url }),
+              h(NAvatar, { size: 'small', src: plugin?.manifest?.logo_url || undefined }),
               h('div', { class: 'ml-2' }, { default: () => plugin?.manifest?.name_for_human }),
             ],
           }
