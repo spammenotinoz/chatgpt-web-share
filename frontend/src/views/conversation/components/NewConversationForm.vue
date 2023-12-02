@@ -30,6 +30,14 @@
                   )
                 }}
               </div>
+              <div class="text-xs text-right">
+                {{ t('commons.remain') }}:
+                {{
+                  getCountTrans(
+                    userStore.user?.setting[newConversationInfo.source!].per_model_ask_count[newConversationInfo.model!]
+                  )
+                }}
+              </div>
             </div>
           </template>
         </n-select>
@@ -58,7 +66,7 @@
 import { NAvatar, NTag, NTooltip, SelectOption, SelectRenderTag } from 'naive-ui';
 import { computed, h, ref, VNode, watch } from 'vue';
 
-import { getAllOpenaiChatPluginsApi, getInstalledOpenaiChatPluginsApi } from '@/api/chat';
+import { getInstalledOpenaiChatPluginsApi, getOpenaiChatPluginsApi } from '@/api/chat';
 import { i18n } from '@/i18n';
 import { useAppStore, useUserStore } from '@/store';
 import { NewConversationInfo } from '@/types/custom';
@@ -68,24 +76,6 @@ import { Message } from '@/utils/tips';
 
 import NewConversationFormModelSelectionLabel from './NewConversationFormModelSelectionLabel.vue';
 import NewConversationFormPluginSelectionLabel from './NewConversationFormPluginSelectionLabel.vue';
-
-//////
-import { MdPeople } from '@vicons/ionicons4';
-import { EventBusyFilled, QueueFilled } from '@vicons/material';
-import { getServerStatusApi } from '@/api/status';
-import { CommonStatusSchema } from '@/types/schema';
-
-const serverStatus = ref<CommonStatusSchema>({});
-
-const updateData = () => {
-  getServerStatusApi().then((res) => {
-    // console.log(res.data);
-    serverStatus.value = res.data;
-  });
-};
-updateData();
-
-///////
 
 const t = i18n.global.t as any;
 
@@ -240,7 +230,7 @@ watch(
       loadingPlugins.value = true;
       try {
         const res = await getInstalledOpenaiChatPluginsApi();
-        availablePlugins.value = res.data;
+        availablePlugins.value = res.data.items;
       } catch (err) {
         Message.error(t('tips.NewConversationForm.failedToGetPlugins'));
       }
@@ -254,14 +244,10 @@ watch(
 
 watch(
   () => {
-    const model = newConversationInfo.value.model;
-    const gpt4Count = serverStatus.value?.gpt4_count_in_3_hours ?? 0;
-    const source = (model === 'gpt_4' && gpt4Count > 45) ? 'openai_api' : (model === 'gpt_4') ? 'openai_web' : 'openai_web'; // If GPT Usage is high, then use APIs
-    
     return {
       title: newConversationInfo.value.title,
-      source: source,
-      model: model,
+      source: newConversationInfo.value.source,
+      model: newConversationInfo.value.model,
       openaiWebPlugins: newConversationInfo.value.openaiWebPlugins,
     } as NewConversationInfo;
   },
@@ -278,5 +264,4 @@ watch(
     newConversationInfo.value.model = null;
   }
 );
-
 </script>
