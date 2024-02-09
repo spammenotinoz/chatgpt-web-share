@@ -285,7 +285,7 @@ const checkChatgptAccount = () => {
 
 const testArkose = async () => {
   const { data } = await getArkoseInfo();
-  const { enabled, url } = data;
+  const { enabled, url, arkose_endpoint_base } = data;
 
   if (!enabled) {
     Message.error('Please set enable_arkose_endpoint to true in the config');
@@ -295,7 +295,8 @@ const testArkose = async () => {
   testArkoseLoading.value = true;
 
   try {
-    const arkoseToken = await getArkoseToken(url);
+    const arkose_endpoint_url = arkose_endpoint_base + url;
+    const arkoseToken = await getArkoseToken(arkose_endpoint_url);
     Message.success(t('tips.success') + ': ' + arkoseToken);
     console.log('Get arkose token', arkoseToken);
   } catch (err: any) {

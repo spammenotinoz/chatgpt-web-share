@@ -356,7 +356,7 @@ const sendMsg = async () => {
 
   let arkoseToken = null as string | null;
   if (arkoseInfo.enabled) {
-    const url = arkoseInfo.url;
+    const url = arkoseInfo.arkose_endpoint_base + arkoseInfo.url;
     try {
       arkoseToken = await getArkoseToken(url);
       console.log('Get arkose token', arkoseToken);

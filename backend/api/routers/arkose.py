@@ -52,7 +52,7 @@ def modify_fc_gt2_url(content: bytes):
     return content
 
 
-async def forward_arkose_request(request: Request, path: str, _user: User = Depends(current_active_user)):
+async def forward_arkose_request(request: Request, path: str):
     """
     TODO：/fc/a/?callback=
     """
@@ -101,11 +101,15 @@ async def forward_arkose_request(request: Request, path: str, _user: User = Depe
 
 
 router.add_api_route("/arkose/p/{path:path}", forward_arkose_request, methods=["GET", "POST"])
-
+# 一些资源需要加载不然404
+router.add_api_route("/api/arkose/p/{path:path}", forward_arkose_request, methods=["GET", "POST"])
 
 @router.get("/arkose/info", tags=["arkose"])
 async def get_arkose_info(_user: User = Depends(current_active_user)):
+    arkose_endpoint_base = f"{config.openai_web.arkose_endpoint_base}"
+    print(arkose_endpoint_base)
     return {
         "enabled": config.openai_web.enable_arkose_endpoint,
-        "url": "/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js"
+        "url": "v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js",
+        "arkose_endpoint_base": arkose_endpoint_base
     }
