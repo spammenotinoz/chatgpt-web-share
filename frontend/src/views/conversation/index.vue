@@ -101,7 +101,7 @@ import { NButton, NIcon, useThemeVars } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { getArkoseInfo } from '@/api/arkose';
+import { getArkoseInfo,getCurrentUrlWithApiPath } from '@/api/arkose';
 import { getAskWebsocketApiUrl } from '@/api/chat';
 import { generateConversationTitleApi } from '@/api/conv';
 import { useAppStore, useConversationStore, useFileStore, useUserStore } from '@/store';
@@ -291,6 +291,7 @@ const sendMsg = async () => {
 
   // 唤起 arkose
   const { data: arkoseInfo } = await getArkoseInfo();
+  const baseUrl = getCurrentUrlWithApiPath();
 
   // 处理附件
   let attachments = null as OpenaiWebChatMessageMetadataAttachment[] | null;
@@ -356,7 +357,7 @@ const sendMsg = async () => {
 
   let arkoseToken = null as string | null;
   if (arkoseInfo.enabled) {
-    const url = arkoseInfo.arkose_endpoint_base + arkoseInfo.url;
+    const url = baseUrl + arkoseInfo.url;
     try {
       arkoseToken = await getArkoseToken(url);
       console.log('Get arkose token', arkoseToken);

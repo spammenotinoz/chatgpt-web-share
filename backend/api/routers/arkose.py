@@ -106,10 +106,7 @@ router.add_api_route("/api/arkose/p/{path:path}", forward_arkose_request, method
 
 @router.get("/arkose/info", tags=["arkose"])
 async def get_arkose_info(_user: User = Depends(current_active_user)):
-    arkose_endpoint_base = f"{config.openai_web.arkose_endpoint_base}"
-    print(arkose_endpoint_base)
     return {
         "enabled": config.openai_web.enable_arkose_endpoint,
-        "url": "v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js",
-        "arkose_endpoint_base": arkose_endpoint_base
+        "url": "arkose/p/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js"
     }

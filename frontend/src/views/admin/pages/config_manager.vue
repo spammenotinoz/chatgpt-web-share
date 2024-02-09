@@ -87,7 +87,7 @@ import { NDynamicTags } from 'naive-ui';
 import { computed, h, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { getArkoseInfo } from '@/api/arkose';
+import { getArkoseInfo, getCurrentUrlWithApiPath } from '@/api/arkose';
 import {
   getSystemConfig,
   getSystemCredentials,
@@ -285,7 +285,8 @@ const checkChatgptAccount = () => {
 
 const testArkose = async () => {
   const { data } = await getArkoseInfo();
-  const { enabled, url, arkose_endpoint_base } = data;
+  const { enabled, url } = data;
+  const baseUrl = getCurrentUrlWithApiPath();
 
   if (!enabled) {
     Message.error('Please set enable_arkose_endpoint to true in the config');
@@ -295,7 +296,7 @@ const testArkose = async () => {
   testArkoseLoading.value = true;
 
   try {
-    const arkose_endpoint_url = arkose_endpoint_base + url;
+    const arkose_endpoint_url = baseUrl + url;
     const arkoseToken = await getArkoseToken(arkose_endpoint_url);
     Message.success(t('tips.success') + ': ' + arkoseToken);
     console.log('Get arkose token', arkoseToken);
