@@ -54,7 +54,7 @@ def modify_fc_gt2_url(content: bytes):
 
 async def forward_arkose_request(request: Request, path: str):
     """
-    TODO：/fc/a/?callback=
+    将 /arkose/p/ 和 /api/arkose/p/ 请求转发至 ninja
     """
     method = request.method
     headers = {
@@ -92,8 +92,15 @@ async def forward_arkose_request(request: Request, path: str):
         content = resp.content
         if resp_content_type and resp_content_type == "application/json":
             content = modify_challenge_url_cdn(resp.content)
-        # elif resp_content_type and resp_content_type == "application/javascript":
-        #     content = modify_fc_gt2_url(resp.content)
+        elif resp_content_type and resp_content_type == "application/javascript":
+            # 处理 /fc/a/?callback=
+            callback_name = request.query_params.get('callback')
+            if callback_name:
+                content = f'{callback_name}({content.decode("utf-8")});'.encode('utf-8')
+                # 设置正确的内容类型
+                headers['Content-Type'] = 'application/javascript'
+            # 这部分应该不需要了，由前端加载 fc_gc2_url，不需要重写
+            # content = modify_fc_gt2_url(resp.content)
         return Response(content=content, headers=headers, status_code=200)
     except httpx.HTTPStatusError as e:
         e = ArkoseForwardException(code=e.response.status_code, message=e.response.text)
@@ -103,6 +110,7 @@ async def forward_arkose_request(request: Request, path: str):
 router.add_api_route("/arkose/p/{path:path}", forward_arkose_request, methods=["GET", "POST"])
 # 一些资源需要加载不然404
 router.add_api_route("/api/arkose/p/{path:path}", forward_arkose_request, methods=["GET", "POST"])
+
 
 @router.get("/arkose/info", tags=["arkose"])
 async def get_arkose_info(_user: User = Depends(current_active_user)):

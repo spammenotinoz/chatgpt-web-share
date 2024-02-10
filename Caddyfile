@@ -9,9 +9,15 @@
 	handle_path /api/* {
 		reverse_proxy localhost:8000
 	}
+
+	handle_path /fc/* {
+		rewrite * /api/arkose/p/fc{path}
+		reverse_proxy localhost:8000
+	}
+
 	handle /* {
 		file_server
-		root * /app/dist
+		root * D:/chatgpt-web-share/frontend/dist
 		try_files {path} /index.html
 	}
 }
