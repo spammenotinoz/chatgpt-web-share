@@ -17,7 +17,7 @@
 
 	handle /* {
 		file_server
-		root * D:/chatgpt-web-share/frontend/dist
+		root * /app/dist
 		try_files {path} /index.html
 	}
 }
