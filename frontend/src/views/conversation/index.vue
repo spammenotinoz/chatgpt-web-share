@@ -352,18 +352,20 @@ const sendMsg = async () => {
   }
 
   // 获取 Arkose 相关信息
-  const { data: arkoseInfo } = await getArkoseInfo();
+  // const { data: arkoseInfo } = await getArkoseInfo();
   const baseUrl = getCurrentUrlWithApiPath();
 
   let arkoseToken = null as string | null;
 
   // 判断是否满足特定条件, TODO: 3.5 API 模型 418 错误需要尝试带 arkose token
   if (currentConversation.value!.source! === 'openai_web' && currentConversation.value!.current_model! === 'gpt_4') {
-    if (arkoseInfo.enabled) {
-      const url = baseUrl + arkoseInfo.url
+    const { data: arkoseInfo } = await getArkoseInfo(); // 异步获取arkoseInfo
+    if (arkoseInfo && arkoseInfo.enabled) {
+      const url = baseUrl + arkoseInfo.url;
       try {
         arkoseToken = await getArkoseToken(url);
         console.log('Get arkose token', arkoseToken);
+        // 使用arkoseToken进行接下来的操作...
       } catch (err: any) {
         console.error('Failed to get Arkose token', err);
         Dialog.error({
@@ -374,8 +376,6 @@ const sendMsg = async () => {
       }
     }
   }
-
-
   const askRequest: AskRequest = {
     new_conversation: isCurrentNewConversation.value,
     source: currentConversation.value!.source,
