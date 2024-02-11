@@ -101,7 +101,7 @@ import { NButton, NIcon, useThemeVars } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { getArkoseInfo } from '@/api/arkose';
+import { getArkoseInfo,getCurrentUrlWithApiPath } from '@/api/arkose';
 import { getAskWebsocketApiUrl } from '@/api/chat';
 import { generateConversationTitleApi } from '@/api/conv';
 import { useAppStore, useConversationStore, useFileStore, useUserStore } from '@/store';
@@ -289,9 +289,6 @@ const sendMsg = async () => {
   isAborted.value = false;
   let hasGotReply = false;
 
-  // 唤起 arkose
-  const { data: arkoseInfo } = await getArkoseInfo();
-
   // 处理附件
   let attachments = null as OpenaiWebChatMessageMetadataAttachment[] | null;
   if (uploadMode.value !== null && fileStore.uploadedFileInfos.length > 0) {
@@ -354,22 +351,31 @@ const sendMsg = async () => {
     ];
   }
 
+  // 获取 Arkose 相关信息
+  // const { data: arkoseInfo } = await getArkoseInfo();
+  const baseUrl = getCurrentUrlWithApiPath();
+
   let arkoseToken = null as string | null;
-  if (arkoseInfo.enabled) {
-    const url = arkoseInfo.url;
-    try {
-      arkoseToken = await getArkoseToken(url);
-      console.log('Get arkose token', arkoseToken);
-    } catch (err: any) {
-      console.error('Failed to get Arkose token', err);
-      Dialog.error({
-        title: t('errors.arkoseError'),
-        content: t('errors.arkoseTokenError'),
-      });
-      return;
+
+  // 判断是否满足特定条件, TODO: 3.5 API 模型 418 错误需要尝试带 arkose token
+  if (currentConversation.value!.source! === 'openai_web' && currentConversation.value!.current_model! === 'gpt_4') {
+    const { data: arkoseInfo } = await getArkoseInfo(); // 异步获取arkoseInfo
+    if (arkoseInfo && arkoseInfo.enabled) {
+      const url = baseUrl + arkoseInfo.url;
+      try {
+        arkoseToken = await getArkoseToken(url);
+        console.log('Get arkose token', arkoseToken);
+        // 使用arkoseToken进行接下来的操作...
+      } catch (err: any) {
+        console.error('Failed to get Arkose token', err);
+        Dialog.error({
+          title: t('errors.arkoseError'),
+          content: t('errors.arkoseTokenError'),
+        });
+        return;
+      }
     }
   }
-
   const askRequest: AskRequest = {
     new_conversation: isCurrentNewConversation.value,
     source: currentConversation.value!.source,
