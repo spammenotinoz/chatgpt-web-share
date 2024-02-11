@@ -173,26 +173,8 @@ async def get_arkose_info(request: Request, _user: User = Depends(current_active
 
     headers = {k: v for k, v in headers.items() if v is not None}
 
-    # 获取请求的URL对象
-    url: httpx.URL = request.url
-
-    # 获取协议、主机和可能的端口
-    scheme = url.scheme
-    host = request.headers.get("x-forwarded-host", url.hostname)
-    forwarded_port = request.headers.get("x-forwarded-port")
-    if forwarded_port:
-        port = forwarded_port
-    else:
-        port = url.port
-
-    # 构建基础URL，考虑到可能的端口
-    if port and ((scheme == "https" and port != 443) or (scheme == "http" and port != 80)):
-        base_url = f"{scheme}://{host}:{port}"
-    else:
-        base_url = f"{scheme}://{host}"
-
     async with httpx.AsyncClient() as client:
-        response = await client.post(f"{base_url}/api/arkose/p/backend-api/sentinel/arkose/dx", headers=headers)
+        response = await client.post(f"{config.openai_web.arkose_endpoint_base}/backend-api/sentinel/arkose/dx", headers=headers)
 
     # 检查请求是否成功
     if response.status_code == 200:
