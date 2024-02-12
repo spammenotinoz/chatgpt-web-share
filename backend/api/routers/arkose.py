@@ -133,13 +133,13 @@ async def forward_arkose_request(request: Request, path: str):
         content = resp.content
         if resp_content_type and resp_content_type == "application/json":
             content = modify_challenge_url_cdn(resp.content)
-        elif resp_content_type and resp_content_type == "application/javascript":
-            # 处理 /fc/a/?callback=
-            callback_name = request.query_params.get('callback')
-            if callback_name:
-                content = f'{callback_name}({content.decode("utf-8")});'.encode('utf-8')
+        # 处理 /fc/a/?callback=, /fc/a/?callback 的 jsonp 不需要包装, 下面这部分就不要了
+        # elif resp_content_type and resp_content_type == "application/javascript":
+            # callback_name = request.query_params.get('callback')
+            # if callback_name:
+                # content = f'{callback_name}({content.decode("utf-8")});'.encode('utf-8')
                 # 设置正确的内容类型
-                headers['Content-Type'] = 'application/javascript'
+            #    headers['Content-Type'] = 'application/javascript'
             # 这部分应该不需要了，由前端加载 fc_gc2_url，不需要重写
             # content = modify_fc_gt2_url(resp.content)
         return Response(content=content, headers=headers, status_code=200)
