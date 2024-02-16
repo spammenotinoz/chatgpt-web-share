@@ -82,10 +82,12 @@ async def forward_arkose_request(request: Request, path: str):
     referer = request.headers.get("referer")
     origin = request.headers.get("origin")
 
-    if referer and "/arkose/p/" in referer:
-        referer_path = referer.split("/arkose/p/", maxsplit=1)[1]
-        referer = f"{config.openai_web.arkose_endpoint_base}{referer_path}"
-        origin = extract_origin(referer)
+    # if referer and "/arkose/p/" in referer:
+    #     referer_path = referer.split("/arkose/p/", maxsplit=1)[1]
+    #     referer = f"{config.openai_web.arkose_endpoint_base}{referer_path}"
+    #     origin = extract_origin(referer)
+    if not referer:
+        referer = f"{config.openai_web.arkose_endpoint_base}"
 
     # 检查是否有cookie，如果有，则处理并添加到headers中
     cookie = request.headers.get("cookie")
@@ -117,7 +119,6 @@ async def forward_arkose_request(request: Request, path: str):
         headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
         blob_data = None
         blob_object = None
-       
     try:
         request_to_send = httpx.Request(method, f"{config.openai_web.arkose_endpoint_base}{path}", headers=headers,
                                         content=modified_data_bytes, params=dict(request.query_params))
@@ -175,7 +176,7 @@ async def get_arkose_info(request: Request, _user: User = Depends(current_active
 
     async with httpx.AsyncClient() as client:
         response = await client.post(f"{config.openai_web.arkose_endpoint_base}backend-api/sentinel/arkose/dx", headers=headers)
-    print(response.json())
+    # print(response.json())
     # 检查请求是否成功
     if response.status_code == 200:
         response_data = response.json()
