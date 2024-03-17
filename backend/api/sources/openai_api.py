@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 config = Config()
 credentials = Credentials()
 
-MAX_CONTEXT_MESSAGE_COUNT = 1000
+MAX_CONTEXT_MESSAGE_COUNT = 5
 
 
 async def _check_response(response: httpx.Response) -> None:
