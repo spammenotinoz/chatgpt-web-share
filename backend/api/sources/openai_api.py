@@ -81,13 +81,13 @@ class OpenaiApiChatManager(metaclass=SingletonMeta):
                 raise ValueError(f"{conversation_id} is not api conversation")
             if not conv_history.mapping.get(str(parent_message_id)):
                 raise ValueError(f"{parent_message_id} is not a valid parent of {conversation_id}")
-            # 从 current_node 开始往前找最多 5 个 message
+            # 从 current_node 开始往前找最多 10 个 message
             if not conv_history.current_node:
                 raise ValueError(f"{conversation_id} current_node is None")
             msg = conv_history.mapping.get(str(conv_history.current_node))
             assert msg, f"{conv_history.id} current_node({conv_history.current_node}) not found in mapping"
             count = 0
-            while msg and count < 5:
+            while msg and count < 10:
                 messages.append(msg)
                 msg = conv_history.mapping.get(str(msg.parent))
                 count += 1
