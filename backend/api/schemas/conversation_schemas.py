@@ -26,7 +26,7 @@ def _validate_model(_source: ChatSourceTypes, model: str | None):
         logger.warning(f"model {model} not in openai_api models: {'|'.join(list(OpenaiApiChatModels))}")
 
 
-MAX_CONTEXT_MESSAGE_COUNT = 100
+MAX_CONTEXT_MESSAGE_COUNT = 1000
 
 
 class AskRequest(BaseModel):
