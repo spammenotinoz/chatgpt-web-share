@@ -2,11 +2,16 @@
   <n-layout-header bordered style="height: var(--header-height)" class="px-3 flex flex-col justify-center">
     <n-page-header>
       <template #title>
-        <n-space :align="'center'">
-          <div class="lt-sm:hidden">
-            <a href="/" style="text-decoration: none; color: inherit">{{ $t('commons.siteTitle') }}</a>
-          </div>
-    </n-space>
+  <n-space :align="'center'">
+    <div class="lt-sm:hidden">
+      <a href="/" style="text-decoration: none; color: inherit">{{ $t('commons.siteTitle') }}</a>
+    </div>
+    <a href="https://new.ultimateai.org" target="_blank" style="text-decoration: none; color: inherit">
+      <n-tag :bordered="false" type="success" size="small" class="hidden sm:inline-flex">
+        Don't forget our new site. Faster and 30+ models. https://new.ultimateai.org
+      </n-tag>
+    </a>
+  </n-space>
       </template>
       <template #avatar>
         <ChatGPTAvatar color="green" icon-style="default" :size="32" />
